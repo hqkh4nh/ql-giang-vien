@@ -1,0 +1,17 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Only signed-in admin accounts may read or write the GiangVien collection.
+    match /GiangVien/{idgv} {
+      allow read, delete: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['IDGV', 'Fullname', 'Image', 'SumClass'])
+        && request.resource.data.IDGV == idgv
+        && request.resource.data.Fullname is string
+        && request.resource.data.Image is string
+        && request.resource.data.SumClass is int
+        && request.resource.data.SumClass >= 0;
+    }
+  }
+}
